@@ -60,7 +60,7 @@ class CDataStream;
 class CAutoFile;
 static const unsigned int MAX_SIZE = 0x02000000;
 
-static const int PROTOCOL_VERSION = 170002;
+static const int PROTOCOL_VERSION = 180003;
 
 // Used to bypass the rule against non-const reference to temporary
 // where it makes sense with wrappers such as CFlatData or CTxDB
@@ -190,16 +190,16 @@ template<typename Stream> inline void Unserialize(Stream& s, bool& a, int, int=0
 //
 // Compact size
 //  size <  253        -- 1 byte
-//  size <= USHRT_MAX  -- 3 bytes  (253 + 2 bytes)
-//  size <= UINT_MAX   -- 5 bytes  (254 + 4 bytes)
-//  size >  UINT_MAX   -- 9 bytes  (255 + 8 bytes)
+//  size <= 0xFFFF     -- 3 bytes  (253 + 2 bytes)
+//  size <= 0xFFFFFFFF -- 5 bytes  (254 + 4 bytes)
+//  size >  0xFFFFFFFF -- 9 bytes  (255 + 8 bytes)
 //
 inline unsigned int GetSizeOfCompactSize(uint64 nSize)
 {
-    if (nSize < 253)             return sizeof(unsigned char);
-    else if (nSize <= USHRT_MAX) return sizeof(unsigned char) + sizeof(unsigned short);
-    else if (nSize <= UINT_MAX)  return sizeof(unsigned char) + sizeof(unsigned int);
-    else                         return sizeof(unsigned char) + sizeof(uint64);
+      if (nSize < 253)                return 1;
+      else if (nSize <= 0xFFFFu)      return 3;
+      else if (nSize <= 0xFFFFFFFFu)  return 5;
+      else                            return 9;
 }
 
 template<typename Stream>
@@ -210,14 +210,14 @@ void WriteCompactSize(Stream& os, uint64 nSize)
         unsigned char chSize = nSize;
         WRITEDATA(os, chSize);
     }
-    else if (nSize <= USHRT_MAX)
+    else if (nSize <= 0xFFFFu)
     {
         unsigned char chSize = 253;
         unsigned short xSize = nSize;
         WRITEDATA(os, chSize);
         WRITEDATA(os, xSize);
     }
-    else if (nSize <= UINT_MAX)
+    else if (nSize <= 0xFFFFFFFFu)
     {
         unsigned char chSize = 254;
         unsigned int xSize = nSize;
@@ -231,7 +231,6 @@ void WriteCompactSize(Stream& os, uint64 nSize)
         WRITEDATA(os, chSize);
         WRITEDATA(os, xSize);
     }
-    return;
 }
 
 template<typename Stream>
