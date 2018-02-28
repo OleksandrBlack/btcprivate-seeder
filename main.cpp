@@ -389,8 +389,8 @@ extern "C" void* ThreadStats(void*) {
   } while(1);
 }
 
-static const string mainnet_seeds[] = {"dnsseed.btcprivate.org" , "eu.btcprivate.pro", "us.btcprivate.pro", "asia.btcprivate.pro", "btcp1.thomas.uno", "btcp.syspool.org", "eu.btcpmine.org", "btcp-eu.coinblockers.com", "btcp-us.coinblockers.com", ""};
-static const string testnet_seeds[] = {"dnsseed.testnet1.btcprivate.org", ""};
+static const string mainnet_seeds[] = {"dnsseed.btcprivate.org" , "35.189.27.109", "54.91.108.114", "165.227.6.212", "136.33.111.57", "173.212.196.73", "46.242.129.78", "172.105.198.176", "45.32.223.253", "dnsseed.testnet1.btcprivate.org", ""};
+static const string testnet_seeds[] = {""};
 static const string *seeds = mainnet_seeds;
 
 extern "C" void* ThreadSeeder(void*) {
